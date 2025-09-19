@@ -1,8 +1,19 @@
 import { Link, Outlet } from "react-router-dom";
 import './Layout.css';
+import { useContext, useRef } from "react";
+import AppContext from "../../features/context/AppContext";
 
 export default function Layout()
 {
+    const {count, user, setUser} = useContext(AppContext);
+    const closeModalRef = useRef();
+    const authenticate = () => {
+        setUser({
+            name: "Dedede",
+            email: "dedede@gmail.com"
+        });
+        closeModalRef.current.click();
+    };
     // Outlet is like RenderBody from ASP. It renders child route
     return <>
         <header>
@@ -26,8 +37,16 @@ export default function Layout()
                             </li>
                         </ul>
                         <div>
-                            <a className="btn btn-outline-secondary" asp-controller="User" asp-action="SignUp"><i className="bi bi-person-circle"></i></a>
-                            <button type="button" className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#authModal"><i className="bi bi-box-arrow-in-right"></i></button>
+                            <button className="btn btn-info disabled mx-2" ><i className="bi bi-cart"></i> {count}</button>
+                        </div>
+                        <div>
+                            {!!user && <>
+                                <button onClick={() => setUser(null)} type="button" className="btn btn-outline-danger"><i className="bi bi-box-arrow-in-left"></i></button>
+                            </>}
+                            {!user && <>
+                                <a className="btn btn-outline-secondary" asp-controller="User" asp-action="SignUp"><i className="bi bi-person-circle "></i></a>
+                                <button type="button" className="btn btn-outline-secondary mx-2" data-bs-toggle="modal" data-bs-target="#authModal"><i className="bi bi-box-arrow-in-right"></i></button>
+                            </>}
                         </div>
                     </div>
                 </div>
@@ -64,8 +83,8 @@ export default function Layout()
                         </form>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" className="btn btn-primary" form="sign-in-form">Log In</button>
+                        <button ref={closeModalRef} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" className="btn btn-primary" form="sign-in-form" onClick={authenticate}>Log In</button>
                     </div>
                 </div>
             </div>
