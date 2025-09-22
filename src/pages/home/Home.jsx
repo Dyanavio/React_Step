@@ -21,14 +21,20 @@ export default function Home()
 
     return <div className="text-center">
         <h1 className="display-4">Store</h1>
-        <button className="btn btn-dark" onClick={onCountClickPositive}>+1</button>
-        <button className="btn btn-outline-dark mx-2" onClick={onCountClickNegative}>-1</button>
-        <h3>Count: {count}</h3>
-        {!!user && <p>Greetings, {user.name}</p>}
-        <hr/>
-        <CountWidget count={count} setCount={setCount}/> {/* Prop Drilling (passiong by reference) */}
-        <hr/>
-        <Calc/>
+        <div className="row">
+            <div className="col">
+                <button className="btn btn-dark" onClick={onCountClickPositive}>+1</button>
+                <button className="btn btn-outline-dark mx-2" onClick={onCountClickNegative}>-1</button>
+                <h3>Count: {count}</h3>
+                {!!user && <p>Greetings, {user.name}</p>}
+                <hr/>
+                <CountWidget count={count} setCount={setCount}/> {/* Prop Drilling (passiong by reference) */}
+            </div>
+            <div className="col">
+                <Calc/>
+            </div>
+        </div>
+        
     </div>;
 }
 
