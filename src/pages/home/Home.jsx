@@ -26,7 +26,7 @@ export default function Home()
                 <button className="btn btn-dark" onClick={onCountClickPositive}>+1</button>
                 <button className="btn btn-outline-dark mx-2" onClick={onCountClickNegative}>-1</button>
                 <h3>Count: {count}</h3>
-                {!!user && <p>Greetings, {user.name}</p>}
+                {!!user && <p>Greetings, {user.Name}</p>}
                 <hr/>
                 <CountWidget count={count} setCount={setCount}/> {/* Prop Drilling (passiong by reference) */}
             </div>

@@ -1,19 +1,12 @@
 import { Link, Outlet } from "react-router-dom";
 import './Layout.css';
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import AppContext from "../../features/context/AppContext";
+import Base64 from "../../shared/base64/Base64";
 
 export default function Layout()
 {
-    const {count, user, setUser} = useContext(AppContext);
-    const closeModalRef = useRef();
-    const authenticate = () => {
-        setUser({
-            name: "Dedede",
-            email: "dedede@gmail.com"
-        });
-        closeModalRef.current.click();
-    };
+    const {count, user, setToken} = useContext(AppContext);
     // Outlet is like RenderBody from ASP. It renders child route
     return <>
         <header>
@@ -41,7 +34,7 @@ export default function Layout()
                         </div>
                         <div>
                             {!!user && <>
-                                <button onClick={() => setUser(null)} type="button" className="btn btn-outline-danger"><i className="bi bi-box-arrow-in-left"></i></button>
+                                <button onClick={() => setToken(null)} type="button" className="btn btn-outline-danger"><i className="bi bi-box-arrow-in-left"></i></button>
                             </>}
                             {!user && <>
                                 <a className="btn btn-outline-secondary" asp-controller="User" asp-action="SignUp"><i className="bi bi-person-circle "></i></a>
@@ -61,34 +54,105 @@ export default function Layout()
             </div>
         </footer>
 
-        <div className="modal fade" id="authModal" tabIndex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
-            <div className="modal-dialog">
+        <AuthModal/>
+
+    </>
+}
+
+function AuthModal()
+{
+    const [isLoading, setIsLoading] = useState(false);
+    const {setToken} = useContext(AppContext);
+    const closeModalRef = useRef();
+
+    //const [login, setLogin] = useState("");
+    //const [password, setPassword] = useState("");
+    const [formState, setFormState] = useState({
+        "login" : "",
+        "password": ""
+    });
+    const [isFormValid, setFormValid] = useState(false);
+
+
+    const credentials = Base64.encode(`${formState.login}:${formState.password}`);
+    const authenticate = () => {
+        console.log(formState.login, formState.password);
+        setIsLoading(true);
+
+        fetch("https://localhost:7195/user/login", {
+            method: "GET",
+            headers: {
+                'Authorization': 'Basic ' + credentials
+            }
+        }).then(r => r.json()).then(j => {
+            setIsLoading(false);
+            if(j.status == 200)
+            {
+                const jwt = j.data;
+                setToken(jwt);
+                closeModalRef.current.click();
+            }
+            else
+            {
+                const alertDiv = document.getElementById('login-alert');
+                if (!alertDiv) throw 'Element #login-alert was not found';
+                alertDiv.innerText = j.data;
+                alertDiv.classList.remove('d-none');
+            }
+        });
+        //setUser({
+        //    name: "Dedede",
+        //    email: "dedede@gmail.com"
+        //});
+        //closeModalRef.current.click();
+    };
+
+
+    useEffect(() => { 
+        console.log("useEffect", formState.login, formState.password);
+        setFormValid(formState.login.length > 2 && formState.password.length > 2);
+    }, [formState]);
+
+    return <div className="modal fade" id="authModal" tabIndex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+            <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">
                         <h1 className="modal-title fs-5" id="authModalLabel">Log In</h1>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div className="modal-body">
-                        <form id="sign-in-form">
                             <div className="input-group mb-3">
                                 <span className="input-group-text" id="user-login-addon"><i className="bi bi-key"></i></span>
-                                    <input name="user-login" type="text" className="form-control" placeholder="Login" aria-label="Логін" aria-describedby="user-login-addon"/>
+                                    <input onChange={e => {
+                                        // THIS SOLUTION IS PROBLEMATICS
+                                        //formState.login = e.target.value;
+                                        //setFormState(formState); // !! This is reference and it does not change. The reference does not change and the state is not updated
+                                        //console.log("event: ", formState.login);
+
+                                        setFormState({...formState, login: e.target.value});
+                                    }} value={formState.login} name="user-login" type="text" className="form-control" placeholder="Login" aria-label="Логін" aria-describedby="user-login-addon"/>
                                     <div className="invalid-feedback"></div>
                             </div>
                             <div className="input-group mb-3">
                                 <span className="input-group-text" id="user-password-addon"><i className="bi bi-lock"></i></span>
-                                <input name="user-password" type="password" className="form-control" placeholder="Password" aria-label="Пароль" aria-describedby="user-password-addon"/>
+                                <input onChange={e => {
+                                        //formState.password = e.target.value;
+                                        setFormState(state => {return {...state, password : e.target.value }; });
+                                    }} value={formState.password} name="user-password" type="password" className="form-control" placeholder="Password" aria-label="Пароль" aria-describedby="user-password-addon"/>
                                 <div className="invalid-feedback"></div>
                             </div>
-                        </form>
                     </div>
                     <div className="modal-footer">
+                        <div className="w-75 d-flex justify-content-start">
+                            <div id="login-alert" className="alert alert-danger d-none" role="alert"></div>
+                        </div>
                         <button ref={closeModalRef} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" className="btn btn-primary" form="sign-in-form" onClick={authenticate}>Log In</button>
+                        <button disabled={!isFormValid} type="button" className="btn btn-primary" id="sign-in-form-button" onClick={authenticate}>
+                            {isLoading ? <span id="log-in-loader" className="spinner-border spinner-border-sm" aria-hidden="true" ></span> : ""}
+                            <span>Log In</span>
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-
-    </>
+        </div>;
 }
