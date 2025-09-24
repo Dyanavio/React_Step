@@ -96,7 +96,7 @@ function AuthModal()
             {
                 const alertDiv = document.getElementById('login-alert');
                 if (!alertDiv) throw 'Element #login-alert was not found';
-                alertDiv.innerText = j.data;
+                alertDiv.innerText = j.data; 
                 alertDiv.classList.remove('d-none');
             }
         });
