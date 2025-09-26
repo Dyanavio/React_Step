@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Layout from './ui/Layout';
+import Layout from './ui/layout/Layout';
 import './ui/App.css';
 import Home from '../pages/home/Home';
 import Privacy from '../pages/privacy/Privacy';
@@ -7,6 +7,7 @@ import About from '../pages/about/About';
 import { useEffect, useState } from 'react';
 import AppContext from '../features/context/AppContext';
 import Base64 from '../shared/base64/Base64';
+import Intro from '../pages/intro/intro';
 
 function App() 
 {
@@ -25,6 +26,7 @@ function App()
       <Routes>
         <Route path="/" element={<Layout/>}>
           <Route index element={<Home/>}/>
+          <Route path="intro" element={<Intro/>}/>
           <Route path="privacy" element={<Privacy/>}/>
           <Route path="about" element={<About/>}/>
         </Route>

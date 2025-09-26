@@ -1,0 +1,30 @@
+.page-title
+{
+    position: relative;
+    width: 100%;
+    height: 25vh;
+    overflow: hidden;
+}
+
+.page-title img
+{
+    height: auto;
+    width: 100%;
+}
+
+.page-title h1
+{
+    position: absolute;
+    right: 10vw;
+    top: 3vh;
+    color: azure;
+    font-weight: 700;
+    z-index: 1;
+}
+
+.item-cart-container
+{
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 15px;
+}
