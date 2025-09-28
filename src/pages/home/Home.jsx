@@ -7,25 +7,17 @@ import { Link } from "react-router-dom";
 
 export default function Home()
 {
-    const {user} = useContext(AppContext);
-    const [pageData, setPageData] = useState({productGroups: []});
+    const {request, productGroups} = useContext(AppContext);
+    const [pageData, setPageData] = useState({});
     const [topPurchases, setTopPurchases] = useState([]);
 
     useEffect(() => {
-       fetch("https://localhost:7195/api/product-group").then(r => r.json()).then(j => {
-        if(j.status.isOk)
+        request("/api/product-group").then(setPageData);
+        
+        fetch("https://localhost:7195/api/product-group/top").then(r => r.json()).then(j =>
         {
-            setPageData(j.data);
-        }
-        else
-        {
-            console.error(j);
-        }
-       });
-       fetch("https://localhost:7195/api/product-group/top").then(r => r.json()).then(j =>
-       {
-            setTopPurchases(j.data.products);
-       });
+                setTopPurchases(j.data.products);
+        });
     }, [])
 
     return <div>
@@ -34,19 +26,7 @@ export default function Home()
             <img src={pageData.pageTitleImage} alt="pageTitleImage"/>
         </div>
         <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
-            {pageData.productGroups.map(group => <div key={group.slug} className="col">
-                <div className="col h-100">    
-                    <div className="card h-100">
-                        <Link to={"/" + group.slug} className="nav-link">
-                            <img src={group.imageUrl} className="card-img-top" alt={group.name}/>
-                        </Link>
-                        <div className="card-body">
-                            <h5 className="card-title">{group.name}</h5>
-                            <p className="card-text">{group.description}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>)}
+            {productGroups.map(group => <GroupCard key={group.slug} group={group}/>)}
         </div>
         <div>
             <div className="border border-1 rounded-2 mt-5 mb-3 p-3">
@@ -70,4 +50,21 @@ export default function Home()
             </div>
         </div>
     </div>;
+}
+
+function GroupCard({group})
+{
+    return <div className="col">
+                <div className="col h-100">    
+                    <div className="card h-100">
+                        <Link to={"/group/" + group.slug} className="nav-link">
+                            <img src={group.imageUrl} className="card-img-top" alt={group.name}/>
+                        </Link>
+                        <div className="card-body">
+                            <h5 className="card-title">{group.name}</h5>
+                            <p className="card-text">{group.description}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 }
