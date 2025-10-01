@@ -5,7 +5,7 @@ import AppContext from "../../../features/context/AppContext";
 export default function AuthModal()
 {
     const [isLoading, setIsLoading] = useState(false);
-    const {setToken} = useContext(AppContext);
+    const {setToken, request} = useContext(AppContext);
     const closeModalRef = useRef();
 
     //const [login, setLogin] = useState("");
@@ -15,44 +15,42 @@ export default function AuthModal()
         "password": ""
     });
     const [isFormValid, setFormValid] = useState(false);
+    const [error, setError] = useState(false);
 
 
-    const credentials = Base64.encode(`${formState.login}:${formState.password}`);
+    
     const authenticate = () => {
         console.log(formState.login, formState.password);
         setIsLoading(true);
+        const credentials = Base64.encode(`${formState.login}:${formState.password}`);
 
-        fetch("https://localhost:7195/user/login", {
+        request("/user/login", {
             method: "GET",
             headers: {
                 'Authorization': 'Basic ' + credentials
             }
-        }).then(r => r.json()).then(j => {
+        }).then(data => {
             setIsLoading(false);
-            if(j.status == 200)
-            {
-                const jwt = j.data;
-                setToken(jwt);
-                closeModalRef.current.click();
-            }
-            else
-            {
-                const alertDiv = document.getElementById('login-alert');
-                if (!alertDiv) throw 'Element #login-alert was not found';
-                alertDiv.innerText = j.data; 
-                alertDiv.classList.remove('d-none');
-            }
-        });
-        //setUser({
-        //    name: "Dedede",
-        //    email: "dedede@gmail.com"
-        //});
-        //closeModalRef.current.click();
+            setToken(data);
+            setError(false);
+            closeModalRef.current.click();
+        }).catch(_ => setError("Log In cancelled"));
     };
+
+    const onModalClose = () =>
+    {
+        setFormValid(true);
+        setIsLoading(false);
+        setError(false);
+        setFormState({
+            "login" : "",
+            "password": ""
+        });
+    }
 
 
     useEffect(() => { 
-        console.log("useEffect", formState.login, formState.password);
+        //console.log("useEffect", formState.login, formState.password);
         setFormValid(formState.login.length > 2 && formState.password.length > 2);
     }, [formState]);
 
@@ -87,9 +85,9 @@ export default function AuthModal()
                     </div>
                     <div className="modal-footer">
                         <div className="w-75 d-flex justify-content-start">
-                            <div id="login-alert" className="alert alert-danger d-none" role="alert"></div>
+                            {error && <div className="alert alert-danger" role="alert">{error}</div>}
                         </div>
-                        <button ref={closeModalRef} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button ref={closeModalRef} onClick={onModalClose} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button disabled={!isFormValid} type="button" className="btn btn-primary" id="sign-in-form-button" onClick={authenticate}>
                             {isLoading ? <span id="log-in-loader" className="spinner-border spinner-border-sm" aria-hidden="true" ></span> : ""}
                             <span>Log In</span>

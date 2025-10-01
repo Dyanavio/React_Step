@@ -10,6 +10,9 @@ export default function Group()
     const {request, productGroups} = useContext(AppContext);
     const [pageData, setPageData] = useState({products: []});
 
+    //const toast = bootstrap.Toast.getOrCreateInstance((document.getElementById('item-added-toast')));
+    //if(toast) toast.show();
+
     useEffect(() => {
         request("/api/product-group/" + slug).then(setPageData);
     }, [slug]); // If effect's body has a variable, it has to be added to the list of dependencies
