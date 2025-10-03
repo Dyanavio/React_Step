@@ -1,0 +1,14 @@
+.v-center
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cart-table-header
+{
+    background-color: gainsboro;
+    padding: 5px 3px;
+    border: 0px solid transparent;
+    border-radius: 3px;
+}

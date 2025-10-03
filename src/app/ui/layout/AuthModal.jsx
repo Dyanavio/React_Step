@@ -7,6 +7,7 @@ export default function AuthModal()
     const [isLoading, setIsLoading] = useState(false);
     const {setToken, request} = useContext(AppContext);
     const closeModalRef = useRef();
+    const modalRef = useRef();
 
     //const [login, setLogin] = useState("");
     //const [password, setPassword] = useState("");
@@ -17,6 +18,10 @@ export default function AuthModal()
     const [isFormValid, setFormValid] = useState(false);
     const [error, setError] = useState(false);
 
+    useEffect(() => {
+        modalRef.current.addEventListener('hide.bs.modal', onModalClose);
+        return () => modalRef.current.removeEventListener('hide.bs.modal', onModalClose);
+    }, []);
 
     
     const authenticate = () => {
@@ -54,7 +59,7 @@ export default function AuthModal()
         setFormValid(formState.login.length > 2 && formState.password.length > 2);
     }, [formState]);
 
-    return <div className="modal fade" id="authModal" tabIndex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    return <div ref={modalRef} className="modal fade" id="authModal" tabIndex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
             <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content">
                     <div className="modal-header">
