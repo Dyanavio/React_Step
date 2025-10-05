@@ -20,7 +20,13 @@ export default function AuthModal()
 
     useEffect(() => {
         modalRef.current.addEventListener('hide.bs.modal', onModalClose);
-        return () => modalRef.current.removeEventListener('hide.bs.modal', onModalClose);
+        
+        return () => {
+            if(modalRef.current)
+            {
+                modalRef.current.removeEventListener('hide.bs.modal', onModalClose);
+            }
+        }
     }, []);
 
     
