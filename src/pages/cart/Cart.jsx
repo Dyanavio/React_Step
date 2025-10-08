@@ -93,13 +93,44 @@ function CartItem({cartItem})
     {
         if(count + cartItem.quantity <= 0)
         {
-            alarm();
+            alarm({
+                title: "Irreversible Changes",
+                message: `Item quantity was set to zero which corresponds to its deletion. Confirm deletion of: '${cartItem.product.name}'`,
+                buttons:
+                [
+                    {status: "dark", title: "Cancel"},
+                    {status: "danger", title: "Delete",},
+                    {status: "secondary", title: "Close"},
+                    {status: "neutral", title: "Delete account"},
+                    {status: "warning", title: "Retract all changes"},
+                    {status: "neutral", title: "Contact owners"},
+                    {status: "neutral", title: "Call IchTamNet (erase cart)"},
+                    {status: "info", title: "Repeat"},
+                    {status: "neutral", title: "To Store"},
+                    {status: "neutral", title: "A"},
+                    {status: "neutral", title: "B"},
+                    {status: "neutral", title: "C"},
+                    {status: "success", title: "Sale"}
+                ],
+                icon: "warning",
+                color: "#5c0404"
+            }).then(status => {
+                console.log(status);
+                if(status == "danger") // danger - for 'Delete'
+                {
+                    request("/api/cart/" + cartItem.productId + "?increment=" + count, {
+                        method: "PATCH"
+                    }).then(updateCart).catch(alert);
+                }
+            }).catch(() => {
+                console.log("Alarm cancelled")
+            });
         }
         else
         {
-             request("/api/cart/" + cartItem.productId + "?increment=" + count, {
-                method: "PATCH"
-             }).then(updateCart).catch(alert)
+            request("/api/cart/" + cartItem.productId + "?increment=" + count, {
+               method: "PATCH"
+            }).then(updateCart).catch(alert)
         }
     }
 
