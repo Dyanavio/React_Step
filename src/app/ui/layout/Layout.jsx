@@ -7,8 +7,9 @@ import AuthModal from "./AuthModal";
 
 export default function Layout()
 {
-    const {selectedItem, cart, setToken, user} = useContext(AppContext);
+    const {selectedItem, cart, setToken, toast, user} = useContext(AppContext);
     // Outlet is like RenderBody from ASP. It renders child route
+    const wordCollection = ["High", "Average", "Mediocre", "Low"]; 
 
     return <>
         <header>
@@ -32,6 +33,9 @@ export default function Layout()
                             </li>
                             <li className="nav-item">
                                 <Link className="nav-link text-dark" to="/about">About</Link>
+                            </li>
+                            <li>
+                                <i onClick={() => toast({message: `Random word: ${wordCollection[Math.floor(Math.random() * 2)]}` }) } className="bi bi-fork-knife"></i>
                             </li>
                         </ul>
                         <div>
